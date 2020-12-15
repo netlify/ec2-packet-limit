@@ -26,8 +26,8 @@ var iface string
 var filename string
 var sendLoop int
 
-func run(shutdownChannel chan struct{}) {
-	conn, err := net.Dial("udp", "172.31.155.155:1000")
+func run(targetIP string, shutdownChannel chan struct{}) {
+	conn, err := net.Dial("udp", targetIP)
 	if err != nil {
 		panic(err)
 	}
@@ -217,6 +217,7 @@ func handleShutdownSignals(shutdownChannel chan struct{}) {
 }
 
 func main() {
+	targetIP := os.Args[1]
 	filename = time.Now().Format("20060102_150405") + ".json.gz"
 	sendLoop = 10000
 
@@ -231,7 +232,7 @@ func main() {
 	})
 	for i := 0; i < runtime.NumCPU() * THREAD_MULTIPLE; i += 1 {
 		goWaitGroup(wg, func() {
-			run(shutdownChannel)
+			run(targetIP, shutdownChannel)
 		})
 	}
 
